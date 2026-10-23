@@ -1,0 +1,10 @@
+gradio==6.26.0
+openai>=1.60
+python-dotenv>=1.0
+pyopenjtalk-plus[onnxruntime]==0.4.1.post9
+sudachipy==0.7.0
+sudachidict-core==20261015
+piper-plus[cpu]==2.0.2
+huggingface_hub>=0.30
+numpy
+spaces

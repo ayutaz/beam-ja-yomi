@@ -1,0 +1,672 @@
+{
+ "conditions": {
+  "beam_direct-high-en-r0": {
+   "n": 300,
+   "exact": 252,
+   "exact_rate": 0.84,
+   "mean_cer": 0.018276026433147175,
+   "format_issues": 0,
+   "truncated": 0,
+   "mean_reasoning_tokens": 592.0366666666666,
+   "total_completion_tokens": 184853,
+   "mean_seconds": 3.8868666666666667,
+   "by_category": {
+    "disaster": {
+     "n": 40,
+     "exact_rate": 0.85,
+     "mean_cer": 0.0033269830659536544
+    },
+    "government": {
+     "n": 30,
+     "exact_rate": 0.9333333333333333,
+     "mean_cer": 0.006485671191553545
+    },
+    "homograph": {
+     "n": 60,
+     "exact_rate": 0.8833333333333333,
+     "mean_cer": 0.017930228096636764
+    },
+    "medical": {
+     "n": 30,
+     "exact_rate": 0.9666666666666667,
+     "mean_cer": 0.00196078431372549
+    },
+    "number": {
+     "n": 60,
+     "exact_rate": 0.85,
+     "mean_cer": 0.02459278022745515
+    },
+    "person": {
+     "n": 30,
+     "exact_rate": 1.0,
+     "mean_cer": 0.0
+    },
+    "place": {
+     "n": 50,
+     "exact_rate": 0.54,
+     "mean_cer": 0.050899088854042415
+    }
+   }
+  },
+  "beam_direct-low-en-r0": {
+   "n": 300,
+   "exact": 247,
+   "exact_rate": 0.8233333333333334,
+   "mean_cer": 0.020644420559149997,
+   "format_issues": 0,
+   "truncated": 0,
+   "mean_reasoning_tokens": 289.19,
+   "total_completion_tokens": 94126,
+   "mean_seconds": 1.5456999999999999,
+   "by_category": {
+    "disaster": {
+     "n": 40,
+     "exact_rate": 0.8,
+     "mean_cer": 0.004199609214315097
+    },
+    "government": {
+     "n": 30,
+     "exact_rate": 0.9666666666666667,
+     "mean_cer": 0.0037037037037037034
+    },
+    "homograph": {
+     "n": 60,
+     "exact_rate": 0.85,
+     "mean_cer": 0.02875272331154684
+    },
+    "medical": {
+     "n": 30,
+     "exact_rate": 0.9,
+     "mean_cer": 0.008839091192032368
+    },
+    "number": {
+     "n": 60,
+     "exact_rate": 0.8,
+     "mean_cer": 0.02491865225417857
+    },
+    "person": {
+     "n": 30,
+     "exact_rate": 0.9666666666666667,
+     "mean_cer": 0.0018518518518518517
+    },
+    "place": {
+     "n": 50,
+     "exact_rate": 0.62,
+     "mean_cer": 0.04746439725602466
+    }
+   }
+  },
+  "beam_direct-low-en-r1": {
+   "n": 300,
+   "exact": 247,
+   "exact_rate": 0.8233333333333334,
+   "mean_cer": 0.023355707479457668,
+   "format_issues": 0,
+   "truncated": 0,
+   "mean_reasoning_tokens": 297.31333333333333,
+   "total_completion_tokens": 96477,
+   "mean_seconds": 1.5848333333333333,
+   "by_category": {
+    "disaster": {
+     "n": 40,
+     "exact_rate": 0.75,
+     "mean_cer": 0.0070334934271771305
+    },
+    "government": {
+     "n": 30,
+     "exact_rate": 1.0,
+     "mean_cer": 0.0
+    },
+    "homograph": {
+     "n": 60,
+     "exact_rate": 0.85,
+     "mean_cer": 0.02335449136919725
+    },
+    "medical": {
+     "n": 30,
+     "exact_rate": 0.9666666666666667,
+     "mean_cer": 0.0037037037037037034
+    },
+    "number": {
+     "n": 60,
+     "exact_rate": 0.8,
+     "mean_cer": 0.0409654336318423
+    },
+    "person": {
+     "n": 30,
+     "exact_rate": 1.0,
+     "mean_cer": 0.0
+    },
+    "place": {
+     "n": 50,
+     "exact_rate": 0.58,
+     "mean_cer": 0.05510131791153463
+    }
+   }
+  },
+  "beam_direct-low-en-r2": {
+   "n": 300,
+   "exact": 253,
+   "exact_rate": 0.8433333333333334,
+   "mean_cer": 0.020416929064862838,
+   "format_issues": 0,
+   "truncated": 0,
+   "mean_reasoning_tokens": 300.04,
+   "total_completion_tokens": 97305,
+   "mean_seconds": 1.5929333333333333,
+   "by_category": {
+    "disaster": {
+     "n": 40,
+     "exact_rate": 0.825,
+     "mean_cer": 0.006358476404916033
+    },
+    "government": {
+     "n": 30,
+     "exact_rate": 1.0,
+     "mean_cer": 0.0
+    },
+    "homograph": {
+     "n": 60,
+     "exact_rate": 0.8333333333333334,
+     "mean_cer": 0.03161381398273981
+    },
+    "medical": {
+     "n": 30,
+     "exact_rate": 1.0,
+     "mean_cer": 0.0
+    },
+    "number": {
+     "n": 60,
+     "exact_rate": 0.8333333333333334,
+     "mean_cer": 0.02655597326649958
+    },
+    "person": {
+     "n": 30,
+     "exact_rate": 0.9333333333333333,
+     "mean_cer": 0.003812636165577342
+    },
+    "place": {
+     "n": 50,
+     "exact_rate": 0.64,
+     "mean_cer": 0.04532346686681052
+    }
+   }
+  },
+  "beam_direct-low-ja-r0": {
+   "n": 300,
+   "exact": 242,
+   "exact_rate": 0.8066666666666666,
+   "mean_cer": 0.023306522941213804,
+   "format_issues": 0,
+   "truncated": 0,
+   "mean_reasoning_tokens": 292.9866666666667,
+   "total_completion_tokens": 94915,
+   "mean_seconds": 1.5247000000000002,
+   "by_category": {
+    "disaster": {
+     "n": 40,
+     "exact_rate": 0.8,
+     "mean_cer": 0.004866017942199234
+    },
+    "government": {
+     "n": 30,
+     "exact_rate": 0.9333333333333333,
+     "mean_cer": 0.01111111111111111
+    },
+    "homograph": {
+     "n": 60,
+     "exact_rate": 0.8166666666666667,
+     "mean_cer": 0.032252788061611595
+    },
+    "medical": {
+     "n": 30,
+     "exact_rate": 0.9666666666666667,
+     "mean_cer": 0.005882352941176471
+    },
+    "number": {
+     "n": 60,
+     "exact_rate": 0.85,
+     "mean_cer": 0.02337282135076253
+    },
+    "person": {
+     "n": 30,
+     "exact_rate": 0.9,
+     "mean_cer": 0.005773420479302832
+    },
+    "place": {
+     "n": 50,
+     "exact_rate": 0.52,
+     "mean_cer": 0.05553546127972027
+    }
+   }
+  },
+  "beam_direct-medium-en-r0": {
+   "n": 300,
+   "exact": 256,
+   "exact_rate": 0.8533333333333334,
+   "mean_cer": 0.01602767524013654,
+   "format_issues": 0,
+   "truncated": 0,
+   "mean_reasoning_tokens": 503.93333333333334,
+   "total_completion_tokens": 158248,
+   "mean_seconds": 3.6084,
+   "by_category": {
+    "disaster": {
+     "n": 40,
+     "exact_rate": 0.85,
+     "mean_cer": 0.0030799592564298445
+    },
+    "government": {
+     "n": 30,
+     "exact_rate": 1.0,
+     "mean_cer": 0.0
+    },
+    "homograph": {
+     "n": 60,
+     "exact_rate": 0.9,
+     "mean_cer": 0.014398482064890732
+    },
+    "medical": {
+     "n": 30,
+     "exact_rate": 0.9,
+     "mean_cer": 0.005399937752878929
+    },
+    "number": {
+     "n": 60,
+     "exact_rate": 0.8833333333333333,
+     "mean_cer": 0.011381571859513035
+    },
+    "person": {
+     "n": 30,
+     "exact_rate": 1.0,
+     "mean_cer": 0.0
+    },
+    "place": {
+     "n": 50,
+     "exact_rate": 0.56,
+     "mean_cer": 0.05952605667466348
+    }
+   }
+  },
+  "beam_fix-high-en-r0": {
+   "n": 300,
+   "exact": 262,
+   "exact_rate": 0.8733333333333333,
+   "mean_cer": 0.044312845133483846,
+   "format_issues": 2,
+   "truncated": 0,
+   "mean_reasoning_tokens": 851.6633333333333,
+   "total_completion_tokens": 263181,
+   "mean_seconds": 5.0421000000000005,
+   "by_category": {
+    "disaster": {
+     "n": 40,
+     "exact_rate": 0.9,
+     "mean_cer": 0.22674242424242425
+    },
+    "government": {
+     "n": 30,
+     "exact_rate": 1.0,
+     "mean_cer": 0.0
+    },
+    "homograph": {
+     "n": 60,
+     "exact_rate": 0.8666666666666667,
+     "mean_cer": 0.016338869463869463
+    },
+    "medical": {
+     "n": 30,
+     "exact_rate": 1.0,
+     "mean_cer": 0.0
+    },
+    "number": {
+     "n": 60,
+     "exact_rate": 0.9166666666666666,
+     "mean_cer": 0.009012113617376775
+    },
+    "person": {
+     "n": 30,
+     "exact_rate": 1.0,
+     "mean_cer": 0.0
+    },
+    "place": {
+     "n": 50,
+     "exact_rate": 0.58,
+     "mean_cer": 0.054061951709468196
+    }
+   }
+  },
+  "beam_fix-low-en-r0": {
+   "n": 300,
+   "exact": 258,
+   "exact_rate": 0.86,
+   "mean_cer": 0.03427158469836152,
+   "format_issues": 1,
+   "truncated": 0,
+   "mean_reasoning_tokens": 338.69666666666666,
+   "total_completion_tokens": 108872,
+   "mean_seconds": 1.5993666666666666,
+   "by_category": {
+    "disaster": {
+     "n": 40,
+     "exact_rate": 0.925,
+     "mean_cer": 0.002728643905114493
+    },
+    "government": {
+     "n": 30,
+     "exact_rate": 1.0,
+     "mean_cer": 0.0
+    },
+    "homograph": {
+     "n": 60,
+     "exact_rate": 0.8833333333333333,
+     "mean_cer": 0.021515290265290265
+    },
+    "medical": {
+     "n": 30,
+     "exact_rate": 0.9333333333333333,
+     "mean_cer": 0.0036062378167641324
+    },
+    "number": {
+     "n": 60,
+     "exact_rate": 0.9166666666666666,
+     "mean_cer": 0.09146825396825396
+    },
+    "person": {
+     "n": 30,
+     "exact_rate": 1.0,
+     "mean_cer": 0.0
+    },
+    "place": {
+     "n": 50,
+     "exact_rate": 0.5,
+     "mean_cer": 0.06570259729576595
+    }
+   }
+  },
+  "beam_fix-low-en-r1": {
+   "n": 300,
+   "exact": 249,
+   "exact_rate": 0.83,
+   "mean_cer": 0.05433788287067575,
+   "format_issues": 1,
+   "truncated": 1,
+   "mean_reasoning_tokens": 309.77,
+   "total_completion_tokens": 115122,
+   "mean_seconds": 1.5442666666666667,
+   "by_category": {
+    "disaster": {
+     "n": 40,
+     "exact_rate": 0.875,
+     "mean_cer": 0.2579304165333577
+    },
+    "government": {
+     "n": 30,
+     "exact_rate": 0.9666666666666667,
+     "mean_cer": 0.0030303030303030303
+    },
+    "homograph": {
+     "n": 60,
+     "exact_rate": 0.8333333333333334,
+     "mean_cer": 0.028821546100957867
+    },
+    "medical": {
+     "n": 30,
+     "exact_rate": 0.9333333333333333,
+     "mean_cer": 0.0036062378167641324
+    },
+    "number": {
+     "n": 60,
+     "exact_rate": 0.8833333333333333,
+     "mean_cer": 0.011856899192425507
+    },
+    "person": {
+     "n": 30,
+     "exact_rate": 1.0,
+     "mean_cer": 0.0
+    },
+    "place": {
+     "n": 50,
+     "exact_rate": 0.48,
+     "mean_cer": 0.06688690513706796
+    }
+   }
+  },
+  "beam_fix-low-en-r2": {
+   "n": 300,
+   "exact": 257,
+   "exact_rate": 0.8566666666666667,
+   "mean_cer": 0.02281972809910958,
+   "format_issues": 0,
+   "truncated": 0,
+   "mean_reasoning_tokens": 344.56666666666666,
+   "total_completion_tokens": 110568,
+   "mean_seconds": 1.5635333333333334,
+   "by_category": {
+    "disaster": {
+     "n": 40,
+     "exact_rate": 0.95,
+     "mean_cer": 0.0018706293706293707
+    },
+    "government": {
+     "n": 30,
+     "exact_rate": 1.0,
+     "mean_cer": 0.0
+    },
+    "homograph": {
+     "n": 60,
+     "exact_rate": 0.8,
+     "mean_cer": 0.038123008527420295
+    },
+    "medical": {
+     "n": 30,
+     "exact_rate": 0.9666666666666667,
+     "mean_cer": 0.00196078431372549
+    },
+    "number": {
+     "n": 60,
+     "exact_rate": 0.9333333333333333,
+     "mean_cer": 0.009246031746031747
+    },
+    "person": {
+     "n": 30,
+     "exact_rate": 0.9666666666666667,
+     "mean_cer": 0.0020833333333333333
+    },
+    "place": {
+     "n": 50,
+     "exact_rate": 0.54,
+     "mean_cer": 0.07615254618177622
+    }
+   }
+  },
+  "beam_fix-medium-en-r0": {
+   "n": 300,
+   "exact": 260,
+   "exact_rate": 0.8666666666666667,
+   "mean_cer": 0.01587062097199419,
+   "format_issues": 0,
+   "truncated": 0,
+   "mean_reasoning_tokens": 656.8166666666667,
+   "total_completion_tokens": 204174,
+   "mean_seconds": 3.974666666666667,
+   "by_category": {
+    "disaster": {
+     "n": 40,
+     "exact_rate": 0.9,
+     "mean_cer": 0.0031662210338680927
+    },
+    "government": {
+     "n": 30,
+     "exact_rate": 1.0,
+     "mean_cer": 0.0
+    },
+    "homograph": {
+     "n": 60,
+     "exact_rate": 0.8666666666666667,
+     "mean_cer": 0.0209519647019647
+    },
+    "medical": {
+     "n": 30,
+     "exact_rate": 1.0,
+     "mean_cer": 0.0
+    },
+    "number": {
+     "n": 60,
+     "exact_rate": 0.9333333333333333,
+     "mean_cer": 0.008134920634920636
+    },
+    "person": {
+     "n": 30,
+     "exact_rate": 1.0,
+     "mean_cer": 0.0
+    },
+    "place": {
+     "n": 50,
+     "exact_rate": 0.52,
+     "mean_cer": 0.05778648660060824
+    }
+   }
+  },
+  "ojt": {
+   "n": 300,
+   "exact": 224,
+   "exact_rate": 0.7466666666666667,
+   "mean_cer": 0.04181624404182434,
+   "format_issues": 1,
+   "truncated": 0,
+   "mean_reasoning_tokens": null,
+   "total_completion_tokens": null,
+   "mean_seconds": null,
+   "by_category": {
+    "disaster": {
+     "n": 40,
+     "exact_rate": 0.7,
+     "mean_cer": 0.012097716467685508
+    },
+    "government": {
+     "n": 30,
+     "exact_rate": 1.0,
+     "mean_cer": 0.0
+    },
+    "homograph": {
+     "n": 60,
+     "exact_rate": 0.6333333333333333,
+     "mean_cer": 0.07544173555202967
+    },
+    "medical": {
+     "n": 30,
+     "exact_rate": 0.9666666666666667,
+     "mean_cer": 0.00196078431372549
+    },
+    "number": {
+     "n": 60,
+     "exact_rate": 0.85,
+     "mean_cer": 0.039000194768446045
+    },
+    "person": {
+     "n": 30,
+     "exact_rate": 1.0,
+     "mean_cer": 0.0
+    },
+    "place": {
+     "n": 50,
+     "exact_rate": 0.36,
+     "mean_cer": 0.10271250410399148
+    }
+   }
+  },
+  "ojt_vanilla": {
+   "n": 300,
+   "exact": 221,
+   "exact_rate": 0.7366666666666667,
+   "mean_cer": 0.0427390510593682,
+   "format_issues": 1,
+   "truncated": 0,
+   "mean_reasoning_tokens": null,
+   "total_completion_tokens": null,
+   "mean_seconds": null,
+   "by_category": {
+    "disaster": {
+     "n": 40,
+     "exact_rate": 0.675,
+     "mean_cer": 0.014852102432597788
+    },
+    "government": {
+     "n": 30,
+     "exact_rate": 1.0,
+     "mean_cer": 0.0
+    },
+    "homograph": {
+     "n": 60,
+     "exact_rate": 0.6166666666666667,
+     "mean_cer": 0.07683062444091855
+    },
+    "medical": {
+     "n": 30,
+     "exact_rate": 0.9666666666666667,
+     "mean_cer": 0.00196078431372549
+    },
+    "number": {
+     "n": 60,
+     "exact_rate": 0.8333333333333334,
+     "mean_cer": 0.040389083657334936
+    },
+    "person": {
+     "n": 30,
+     "exact_rate": 1.0,
+     "mean_cer": 0.0
+    },
+    "place": {
+     "n": 50,
+     "exact_rate": 0.36,
+     "mean_cer": 0.10271250410399148
+    }
+   }
+  }
+ },
+ "fix_vs_ojt": {
+  "beam_fix-high-en-r0": {
+   "fixed": 48,
+   "broken": 10,
+   "kept_correct": 214,
+   "still_wrong": 28
+  },
+  "beam_fix-low-en-r0": {
+   "fixed": 45,
+   "broken": 11,
+   "kept_correct": 213,
+   "still_wrong": 31
+  },
+  "beam_fix-low-en-r1": {
+   "fixed": 38,
+   "broken": 13,
+   "kept_correct": 211,
+   "still_wrong": 38
+  },
+  "beam_fix-low-en-r2": {
+   "fixed": 39,
+   "broken": 6,
+   "kept_correct": 218,
+   "still_wrong": 37
+  },
+  "beam_fix-medium-en-r0": {
+   "fixed": 46,
+   "broken": 10,
+   "kept_correct": 214,
+   "still_wrong": 30
+  }
+ },
+ "run_spread": {
+  "beam_direct-low-en": {
+   "runs": 3,
+   "min": 0.8233333333333334,
+   "max": 0.8433333333333334
+  },
+  "beam_fix-low-en": {
+   "runs": 3,
+   "min": 0.83,
+   "max": 0.86
+  }
+ }
+}
