@@ -32,4 +32,6 @@ OpenJTalk's reading only.
 reading (`reasoning_effort` low; the prompts are in the code repository). The draft helps for
 numbers and homographs and hurts for place names, where Beam tends to keep OpenJTalk's マチ for 町.
 On the 300 sentences, asking Beam a second time without the draft and keeping the reading only when
-both answers agree left three quarters of the sentences 97% right (a post-hoc check; see the dataset card).
+both answers agree left three quarters of the sentences 97% right (a post-hoc check; see the dataset card). The
+follow-up, [Yomi-Distill](https://huggingface.co/ayousanz/yomi-distill-ja), confirmed it on 99 new sentences (97.0%), and tried to
+distill Beam's fixes into a 1.8B model: it did not beat OpenJTalk.
