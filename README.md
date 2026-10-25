@@ -73,8 +73,9 @@ Wikipedia sentences twice; the 5,515 where its two answers agreed trained `llm-j
 candidates, the selection on a dev set and the bar to pass were pre-registered, and the frozen model was scored once.
 
 **It did not beat OpenJTalk**: 74.7% on the 300 sentences, the same as OpenJTalk (Beam correcting OpenJTalk: 86.0%).
-It mostly copies OpenJTalk's reading; its only gain is reading 町 in place names as チョウ. On 99 new sentences, when
-Beam's two answers agreed (67), the reading was right 97.0% of the time, which supports the check above.
+It mostly copies OpenJTalk's reading; on the 300, all of its fixes are reading 町 in place names as チョウ. On 99 new
+sentences (readings written by Claude, not checked by a person), when Beam's two answers agreed (67), the reading was
+right 65 times (97.0%), which supports the check above.
 
 - Model: https://huggingface.co/ayousanz/yomi-distill-ja
 - Teaching data, test sets, pre-registration and results: https://huggingface.co/datasets/ayousanz/beam-yomi-teacher
@@ -127,7 +128,8 @@ uv run scripts/sweep_dev.py --freeze                        # train the candidat
 uv run scripts/predict_student.py --model models/<chosen> --items data/yomi.jsonl --out results/distill/eval300/student.jsonl
 ```
 
-The checked `dev` and `test` readings are in the Hugging Face dataset (`data/fresh_dev.jsonl`,
+The `dev` and `test` readings (written by Claude and cross-checked by a second Claude reading, not by a person) are
+in the Hugging Face dataset (`data/fresh_dev.jsonl`,
 `data/fresh_test.jsonl`); put them at `data/fresh/dev.jsonl` and `data/fresh/test.jsonl`.
 
 ## Layout
@@ -136,7 +138,7 @@ The checked `dev` and `test` readings are in the Hugging Face dataset (`data/fre
 |---|---|
 | `data/yomi.jsonl` | the dataset (same as on Hugging Face) |
 | `yomibench/` | normalization, metrics, systems, evaluation, summary, demo helpers; Part 2's pool, teacher, student and gate |
-| `scripts/` | command-line entry points (sampling place names, review sheet, evaluation, summary, publishing) |
+| `scripts/` | command-line entry points (sampling place names, review sheet, evaluation, summary, publishing; Part 2's corpus, teacher, training, dev sweep and scoring) |
 | `space/` | the Gradio demo of Part 1 |
 | `space_distill/` | the Gradio demo of Part 2 (the student on ZeroGPU) |
 | `tests/` | tests |
@@ -144,7 +146,7 @@ The checked `dev` and `test` readings are in the Hugging Face dataset (`data/fre
 
 ## License and credits
 
-- Code: MIT. Dataset: CC BY 4.0. Part 2's teaching data and test sets: from Japanese Wikipedia, CC BY-SA 3.0
+- Code: MIT. Dataset: CC BY 4.0. Part 2's model: Apache 2.0 (as llm-jp-3-1.8b). Part 2's teaching data and test sets: from Japanese Wikipedia, CC BY-SA 3.0
   (on Hugging Face).
 - Place names: Japan Post postal code data (no copyright claimed by Japan Post).
 - Reading converter: [pyopenjtalk-plus](https://github.com/tsukumijima/pyopenjtalk-plus).
