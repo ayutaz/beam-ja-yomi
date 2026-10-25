@@ -78,7 +78,7 @@ def files_for(target: str, root: Path = ROOT) -> list[tuple[Path, str]]:
 
 
 def check_release(root: Path = ROOT) -> list[str]:
-    """Before a public upload: the fresh sets are human-checked, and no card has a placeholder left."""
+    """Before any upload: the fresh sets are human-checked, and no card has a placeholder left."""
     from yomibench.data import load_items
     from yomibench.fresh import validate_fresh
 
@@ -96,8 +96,10 @@ def check_release(root: Path = ROOT) -> list[str]:
     return problems
 
 
-def upload(api, target: str, repo: str, files: list[tuple[Path, str]], private: bool = False) -> str:
-    """Create the repo if needed and upload exactly `files` in one commit. Returns the commit URL."""
+def upload(api, target: str, repo: str, files: list[tuple[Path, str]], private: bool = False,
+           make_public: bool = False) -> str:
+    """Create the repo if needed and upload exactly `files` in one commit. Returns the commit URL.
+    make_public: afterwards switch an existing private repo to public (otherwise its visibility is kept)."""
     from huggingface_hub import CommitOperationAdd
 
     repo_type = REPO_TYPE[target]
@@ -106,6 +108,8 @@ def upload(api, target: str, repo: str, files: list[tuple[Path, str]], private: 
     api.create_repo(repo, repo_type=repo_type, exist_ok=True, private=True if private else None, **space)
     ops = [CommitOperationAdd(path_in_repo=dst, path_or_fileobj=str(src)) for src, dst in files]
     info = api.create_commit(repo, operations=ops, repo_type=repo_type, commit_message="Upload from beam-ja-yomi-bench")
+    if make_public:
+        api.update_repo_settings(repo, private=False, repo_type=repo_type)
     return info.commit_url
 
 
@@ -116,12 +120,15 @@ def main():
     ap.add_argument("--repo", required=True)
     ap.add_argument("--yes", action="store_true", help="really upload (otherwise list only)")
     ap.add_argument("--private", action="store_true", help="create the repo as private (a new repo only)")
+    ap.add_argument("--make-public", action="store_true", help="after uploading, switch the repo to public")
     args = ap.parse_args()
+    if args.private and args.make_public:
+        sys.exit("--private and --make-public contradict each other")
 
-    if not args.private:
-        problems = check_release(ROOT)
-        if problems:
-            sys.exit("not ready for a public upload:\n" + "\n".join(problems[:20]))
+    # private uploads too: a repo created public, or switched to public later, keeps the files as they are
+    problems = check_release(ROOT)
+    if problems:
+        sys.exit("not ready for an upload:\n" + "\n".join(problems[:20]))
     files = files_for(args.target, ROOT)
     for src, dst in files:
         print(f"{dst}  <-  {src.relative_to(ROOT).as_posix()}  ({src.stat().st_size} bytes)")
@@ -137,7 +144,9 @@ def main():
     token = os.environ.get("HF_TOKEN")
     if not token:
         sys.exit("HF_TOKEN is not set in .env")
-    print(f"uploaded: {upload(HfApi(token=token), args.target, args.repo, files, args.private)}")
+    print(f"uploaded: {upload(HfApi(token=token), args.target, args.repo, files, args.private, args.make_public)}")
+    if args.make_public:
+        print(f"{args.repo} is now public")
 
 
 if __name__ == "__main__":

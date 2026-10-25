@@ -1,3 +1,5 @@
+import json
+
 from yomibench.distill_eval import bootstrap_ci, summarize_run
 
 
@@ -84,3 +86,43 @@ def test_fallback_rate_counts_only_the_given_items():
     rows = [{"id": "a", "fallback": True}, {"id": "b", "fallback": False}, {"id": "c", "fallback": False}]
     assert fallback_rate(rows, {"a", "b"}) == 1 / 2
     assert fallback_rate([{"id": "a", "output": "ア"}], {"a"}) is None
+
+
+def test_triage_uses_the_teachers_agreement_rule():
+    from scripts.eval_distill import triage
+
+    items = [_item("a", "カライ"), _item("b", "カライ")]
+    direct = [{"id": "a", "output": "。", "truncated": False}, {"id": "b", "output": "カライ", "truncated": False}]
+    fix = [{"id": "a", "output": "、", "truncated": False}, {"id": "b", "output": "カライ", "truncated": False}]
+    # a: both answers are punctuation only (empty reading); teacher.agree rejects it, so triage must too
+    assert triage(items, direct, fix)[0].startswith("- Agreed (accept Beam's reading): 1/2")
+
+
+def test_stale_outputs_flags_a_model_trained_with_other_settings(tmp_path):
+    from yomibench.distill_eval import stale_outputs
+
+    cand = {"name": "s440-e2", "base": "llm-jp/llm-jp-3-440m", "lora": False, "epochs": 2}
+    model = tmp_path / "models" / "s440-e2"
+    model.mkdir(parents=True)
+    (model / "config.json").write_text("{}", encoding="utf-8")
+    (model / "train_config.json").write_text(json.dumps({"base": "llm-jp/llm-jp-3-440m", "lora": False, "epochs": 1}),
+                                             encoding="utf-8")
+    pred = tmp_path / "pred.jsonl"
+    assert any("epochs" in p for p in stale_outputs(cand, model, pred, {"x"}))
+
+
+def test_stale_outputs_flags_predictions_for_other_sentences(tmp_path):
+    from yomibench.distill_eval import stale_outputs
+
+    cand = {"name": "s440-e2", "base": "llm-jp/llm-jp-3-440m", "lora": False, "epochs": 2}
+    model = tmp_path / "models" / "s440-e2"
+    model.mkdir(parents=True)
+    (model / "config.json").write_text("{}", encoding="utf-8")
+    (model / "train_config.json").write_text(json.dumps({k: cand[k] for k in ("base", "lora", "epochs")}),
+                                             encoding="utf-8")
+    pred = tmp_path / "pred.jsonl"
+    pred.write_text(json.dumps({"id": "x"}) + "\n" + json.dumps({"id": "old"}) + "\n", encoding="utf-8")
+    assert any("sentences" in p for p in stale_outputs(cand, model, pred, {"x", "y"}))
+    pred.write_text(json.dumps({"id": "x"}) + "\n" + json.dumps({"id": "y"}) + "\n", encoding="utf-8")
+    assert stale_outputs(cand, model, pred, {"x", "y"}) == []
+    assert stale_outputs(cand, tmp_path / "missing", tmp_path / "missing.jsonl", {"x"}) == []

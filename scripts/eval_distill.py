@@ -20,7 +20,7 @@ from yomibench import ROOT  # noqa: E402
 from yomibench.data import DATA_PATH, load_items  # noqa: E402
 from yomibench.distill_eval import bootstrap_ci, fallback_rate, summarize_run  # noqa: E402
 from yomibench.metrics import score  # noqa: E402
-from yomibench.normalize import has_non_reading, normalize  # noqa: E402
+from yomibench.teacher import agree  # noqa: E402
 
 ITEMS = {"dev": ROOT / "data" / "fresh" / "dev.jsonl", "test": ROOT / "data" / "fresh" / "test.jsonl",
          "eval300": DATA_PATH}
@@ -50,11 +50,7 @@ def table(items, ojt, systems: dict[str, list[dict]]) -> list[str]:
 def triage(items, direct: list[dict], fix: list[dict]) -> list[str]:
     d = {r["id"]: r for r in direct}
     f = {r["id"]: r for r in fix}
-    agreed = [i for i in items
-              if not d[i["id"]].get("truncated") and not f[i["id"]].get("truncated")
-              and d[i["id"]]["output"].strip() and not has_non_reading(d[i["id"]]["output"])
-              and not has_non_reading(f[i["id"]]["output"])
-              and normalize(d[i["id"]]["output"]) == normalize(f[i["id"]]["output"])]
+    agreed = [i for i in items if agree(d[i["id"]], f[i["id"]])]  # the same rule that picked the teaching pairs
     ok = sum(score(i, f[i["id"]]["output"])["match"] for i in agreed)
     rest = [i for i in items if i not in agreed]
     rest_ok = sum(score(i, f[i["id"]]["output"])["match"] for i in rest)

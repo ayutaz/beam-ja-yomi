@@ -6,8 +6,8 @@ Space's Try it. With --provider reflection, the run stops itself after --daily-c
 the rest for Try it.
 Responses are cached in cache/teacher/; a rerun resumes for free and counts cached usage toward the
 budget, so it stops at the same place. Sentences picked for the fresh human-checked sets
-(data/distill/excluded_ids.txt), and pool sentences close to them, are skipped. Failed calls (429, 5xx,
-timeouts after retries) are left out of the output and retried on the next run. Rows already in --out
+(data/distill/excluded_ids.txt), and pool sentences close to them, are skipped. Failed rows (429, 5xx,
+timeouts after retries, or any other error) are left out of the output and retried on the next run. Rows already in --out
 are kept and not asked again (so a switch of provider never pays twice); earlier HF rows count toward
 the budget.
 
@@ -21,11 +21,9 @@ import argparse
 import datetime
 import json
 import sys
-from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from types import SimpleNamespace
 
-import openai
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
@@ -33,8 +31,8 @@ from yomibench import ROOT  # noqa: E402
 from yomibench.corpus import LeakFilter  # noqa: E402
 from yomibench.data import load_items  # noqa: E402
 from yomibench.systems import openjtalk  # noqa: E402
-from yomibench.systems.beam import BeamClient, DailyLimitReached  # noqa: E402
-from yomibench.teacher import (Budget, DailyCapReached, TokenMeter, cache_cost_usd, cost_usd, teach_one,  # noqa: E402
+from yomibench.systems.beam import BeamClient  # noqa: E402
+from yomibench.teacher import (Budget, TokenMeter, cache_cost_usd, cost_usd, teach_all, teach_one,  # noqa: E402
                                tokens_since)
 
 DISTILL = ROOT / "data" / "distill"
@@ -73,32 +71,10 @@ def main() -> None:
     for r in prev.values():
         if r.get("provider") == "hf":
             budget.add(r)
-    stop = None
-    done, failed = dict(prev), 0
-    with ThreadPoolExecutor(args.workers) as ex:
-        futures = {ex.submit(teach_one, beam, r["text"], openjtalk.read(r["text"]), args.effort): r for r in rows}
-        for fut in as_completed(futures):
-            r = futures[fut]
-            try:
-                out = fut.result()
-            except (DailyCapReached, DailyLimitReached) as err:
-                stop = f"{type(err).__name__}: {err}"
-                for f in futures:
-                    f.cancel()
-                break
-            except (openai.APIError, openai.APIConnectionError) as err:
-                failed += 1
-                print(f"{r['id']}: {type(err).__name__}", file=sys.stderr)
-                continue
-            done[r["id"]] = {**r, **out, "provider": args.provider}
-            budget.add(out)
-            if len(done) % 200 == 0:
-                print(f"{len(done)} done, ${budget.spent:.2f}", flush=True)
-            if budget.exceeded:
-                print(f"budget reached at {len(done)} rows (${budget.spent:.2f}); cancelling the rest")
-                for f in futures:
-                    f.cancel()
-                break
+    drafts = {r["id"]: openjtalk.read(r["text"]) for r in rows}  # OpenJTalk in this thread only
+    new, failed, stop = teach_all(lambda r: teach_one(beam, r["text"], drafts[r["id"]], args.effort), rows,
+                                  args.workers, budget)
+    done = {**prev, **{rid: {**r, "provider": args.provider} for rid, r in new.items()}}
 
     args.out.parent.mkdir(parents=True, exist_ok=True)
     with open(args.out, "w", encoding="utf-8", newline="\n") as f:

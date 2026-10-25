@@ -20,7 +20,7 @@ from yomibench import ROOT  # noqa: E402
 from yomibench.data import load_items  # noqa: E402
 from yomibench.student import gate  # noqa: E402
 from yomibench.distill_eval import (DEFAULT_GATE, GATE_GRID, choose, file_hashes, passes_g1, regate,  # noqa: E402
-                                    summarize_run)
+                                    stale_outputs, summarize_run)
 
 # docs/prereg_yomi_distill.md, "Candidates"; listed smaller model and fewer epochs first (the last tie-break)
 CANDIDATES = [
@@ -60,6 +60,9 @@ def main() -> None:
     for c in cands:
         model = MODELS / c["name"]
         pred = OUT / "dev" / f"{c['name']}.jsonl"
+        stale = stale_outputs(c, model, pred, {i["id"] for i in items})
+        if stale:
+            sys.exit("will not reuse (delete them to train or predict again):\n" + "\n".join(stale))
         if not (model / "config.json").exists():
             run(["scripts/train_student.py", "--base", c["base"], "--epochs", str(c["epochs"]), "--out", str(model)]
                 + (["--lora"] if c["lora"] else []))

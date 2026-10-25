@@ -1,6 +1,6 @@
 """Train the student on the teacher pairs where Beam's two readings agree (plan 2026-10-24, Task 5).
 
-Input: data/distill/teacher.jsonl (rows with agree == true). Prompt: yomibench.student.format_prompt(text,
+Input: data/distill/teacher.jsonl (rows with agree == true; it stops if one overlaps a scored sentence). Prompt: yomibench.student.format_prompt(text,
 ojt); target: clean_target(fix) + EOS. The loss covers the target only. Full fine-tuning, or LoRA with
 --lora (merged into the base weights before saving, so inference needs no peft).
 
@@ -22,10 +22,12 @@ from transformers import AutoModelForCausalLM, AutoTokenizer, get_linear_schedul
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from yomibench import ROOT  # noqa: E402
-from yomibench.data import load_items  # noqa: E402
+from yomibench.data import DATA_PATH, load_items  # noqa: E402
 from yomibench.student import clean_target, format_prompt  # noqa: E402
+from yomibench.teacher import training_rows  # noqa: E402
 
 TEACHER = ROOT / "data" / "distill" / "teacher.jsonl"
+FRESH_DRAFT = ROOT / "data" / "fresh" / "draft.jsonl"
 MAX_LEN = 256
 
 
@@ -64,7 +66,9 @@ def main() -> None:
     lr = args.lr or (2e-4 if args.lora else 2e-5)
 
     torch.manual_seed(args.seed)
-    rows = [r for r in load_items(args.teacher) if r["agree"]]
+    # refuse to train on anything near the sentences the student is scored on (the 300 and the fresh 200)
+    scored = [i["text"] for i in load_items(DATA_PATH)] + [r["text"] for r in load_items(FRESH_DRAFT)]
+    rows = training_rows(load_items(args.teacher), scored)
     tok = AutoTokenizer.from_pretrained(args.base)
     pad_id = tok.pad_token_id if tok.pad_token_id is not None else tok.eos_token_id
     examples = [encode(tok, r) for r in rows]

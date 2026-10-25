@@ -109,3 +109,52 @@ def cache_cost_usd(cache_dir: Path, model: str = HF_MODEL) -> float:
                                 **{k: v or 0 for k, v in (data.get("usage") or {}).items()
                                    if k in ("prompt_tokens", "completion_tokens")}}])
     return total
+
+
+def training_rows(rows: list[dict], eval_texts: list[str]) -> list[dict]:
+    """The agreed rows, to train on. Raises ValueError if any of them overlaps a sentence the student is
+    scored on (same check as the pool's: an equal sentence or a shared content 5-gram)."""
+    from yomibench.corpus import LeakFilter
+
+    leak = LeakFilter(eval_texts)
+    agreed = [r for r in rows if r["agree"]]
+    bad = [r.get("id", r["text"]) for r in agreed if leak.leaks(r["text"])]
+    if bad:
+        raise ValueError(f"{len(bad)} teaching rows overlap the scored sentences: {bad[:5]}")
+    return agreed
+
+
+def teach_all(teach, rows: list[dict], workers: int, budget: Budget) -> tuple[dict, int, str | None]:
+    """Run teach(row) for each row in a thread pool. Returns ({id: row + teach's output}, failed, stop).
+    Any error of one row (after the client's retries) counts as failed, and the row is asked again on the
+    next run; the daily cap or the provider's daily limit stops the run (`stop` says why); so does the budget."""
+    import sys
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+
+    from yomibench.systems.beam import DailyLimitReached
+
+    done, failed, stop = {}, 0, None
+    with ThreadPoolExecutor(workers) as ex:
+        futures = {ex.submit(teach, r): r for r in rows}
+        for fut in as_completed(futures):
+            r = futures[fut]
+            try:
+                out = fut.result()
+            except (DailyCapReached, DailyLimitReached) as err:
+                stop = f"{type(err).__name__}: {err}"
+            except Exception as err:  # noqa: BLE001 - one bad response must not lose the finished rows
+                failed += 1
+                print(f"{r['id']}: {type(err).__name__}: {err}", file=sys.stderr)
+                continue
+            else:
+                done[r["id"]] = {**r, **out}
+                budget.add(out)
+                if len(done) % 200 == 0:
+                    print(f"{len(done)} new rows, ${budget.spent:.2f}", flush=True)
+                if budget.exceeded:
+                    stop = f"budget reached at {len(done)} new rows (${budget.spent:.2f})"
+            if stop:
+                for f in futures:
+                    f.cancel()
+                break
+    return done, failed, stop

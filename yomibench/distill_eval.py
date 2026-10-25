@@ -70,3 +70,27 @@ def file_hashes(model_dir) -> dict[str, str]:
                     h.update(block)
             out[p.name] = h.hexdigest()
     return out
+
+
+def stale_outputs(cand: dict, model_dir, pred_path, dev_ids: set[str]) -> list[str]:
+    """Why an existing model or dev prediction file must not be reused for `cand` (empty if fine or absent):
+    the model's train_config.json names other settings, or the predictions cover other sentences."""
+    import json
+    from pathlib import Path
+
+    from yomibench.data import load_items
+
+    model_dir, pred_path = Path(model_dir), Path(pred_path)
+    problems = []
+    config = model_dir / "train_config.json"
+    if (model_dir / "config.json").exists():
+        trained = json.loads(config.read_text(encoding="utf-8")) if config.exists() else {}
+        for key in ("base", "lora", "epochs"):
+            if trained.get(key) != cand[key]:
+                problems.append(f"{model_dir}: {key} is {trained.get(key)!r}, the candidate needs {cand[key]!r}")
+    if pred_path.exists():
+        got = {r["id"] for r in load_items(pred_path)}
+        if got != dev_ids:
+            problems.append(f"{pred_path}: predictions for other sentences ({len(got - dev_ids)} not in dev, "
+                            f"{len(dev_ids - got)} missing)")
+    return problems

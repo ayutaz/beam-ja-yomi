@@ -115,3 +115,38 @@ def test_cache_cost_counts_every_cached_response_of_the_model(tmp_path):
                                ("c", "other", {"prompt_tokens": 999, "completion_tokens": 999})]:
         (tmp_path / f"{name}.json").write_text(json.dumps({"model": model, "usage": usage}), encoding="utf-8")
     assert cache_cost_usd(tmp_path, "hf-model") == (300 * USD_PER_M_INPUT + 30 * USD_PER_M_OUTPUT) / 1_000_000
+
+
+def test_training_rows_keep_agreed_rows_and_refuse_a_leak():
+    from yomibench.teacher import training_rows
+
+    eval_texts = ["岬町の海岸で花火大会が開かれた。"]
+    ok = {"text": "東京都の人口は増えている。", "agree": True}
+    no = {"text": "大阪の天気。", "agree": False}
+    assert training_rows([ok, no], eval_texts) == [ok]
+    leak = {"text": "昨夜、岬町の海岸で花火大会が開かれた。", "agree": True}
+    with pytest.raises(ValueError, match="overlap"):
+        training_rows([ok, leak], eval_texts)
+
+
+def test_teach_all_counts_any_error_as_a_failed_row_and_keeps_the_rest():
+    from yomibench.teacher import teach_all
+
+    def teach(row):
+        if row["id"] == "bad":
+            raise KeyError("choices")  # not an openai error
+        return {"prompt_tokens": 0, "completion_tokens": 0}
+
+    rows = [{"id": "a"}, {"id": "bad"}, {"id": "b"}]
+    done, failed, stop = teach_all(teach, rows, workers=2, budget=Budget(1.0))
+    assert set(done) == {"a", "b"} and failed == 1 and stop is None
+
+
+def test_teach_all_stops_at_the_daily_cap():
+    from yomibench.teacher import DailyCapReached, teach_all
+
+    def teach(row):
+        raise DailyCapReached("cap")
+
+    done, failed, stop = teach_all(teach, [{"id": "a"}], workers=1, budget=Budget(1.0))
+    assert done == {} and failed == 0 and stop.startswith("DailyCapReached")

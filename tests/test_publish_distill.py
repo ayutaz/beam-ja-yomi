@@ -93,6 +93,9 @@ class _FakeApi:
         self.calls.append(("create_commit", repo_id, kw))
         return type("Info", (), {"commit_url": "https://hf.co/x"})()
 
+    def update_repo_settings(self, repo_id, **kw):
+        self.calls.append(("update_repo_settings", repo_id, kw))
+
 
 def test_upload_uses_the_right_repo_type_and_zero_gpu_for_the_space(repo):
     for target, repo_type in (("model", "model"), ("data", "dataset"), ("space", "space")):
@@ -124,3 +127,24 @@ def test_model_upload_stops_when_a_file_appeared_after_freezing(repo):
     (repo / "models/s440-e2/extra.bin").write_text("x", encoding="utf-8")
     with pytest.raises(ValueError, match="extra.bin"):
         files_for("model", repo)
+
+
+def test_upload_makes_the_repo_public_after_the_commit_only_when_asked(repo):
+    api = _FakeApi()
+    upload(api, "data", "me/x", files_for("data", repo), make_public=True)
+    assert [c[0] for c in api.calls] == ["create_repo", "create_commit", "update_repo_settings"]
+    assert api.calls[2][2] == {"private": False, "repo_type": "dataset"}
+    api = _FakeApi()
+    upload(api, "data", "me/x", files_for("data", repo))
+    assert "update_repo_settings" not in [c[0] for c in api.calls]
+
+
+def test_a_private_upload_is_checked_too(repo, monkeypatch):
+    import scripts.publish_distill as pd
+
+    for split in ("dev", "test"):
+        (repo / f"data/fresh/{split}.jsonl").write_text("", encoding="utf-8")
+    monkeypatch.setattr(pd, "ROOT", repo)
+    monkeypatch.setattr("sys.argv", ["publish_distill.py", "--target", "data", "--repo", "me/x", "--private"])
+    with pytest.raises(SystemExit, match="not ready"):
+        pd.main()
