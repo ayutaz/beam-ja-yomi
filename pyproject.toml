@@ -13,8 +13,20 @@ dependencies = [
 ]
 
 [dependency-groups]
-dev = ["pytest>=8"]
+dev = [
+    "matplotlib>=3.11.2",
+    "pytest>=8",
+]
 space = ["gradio==6.26.0", "piper-plus[cpu]==2.0.2", "numpy"]
+train = ["torch==2.14.1", "transformers", "peft", "accelerate", "safetensors", "pyarrow"]
+
+[[tool.uv.index]]
+name = "pytorch-cu126"
+url = "https://download.pytorch.org/whl/cu126"
+explicit = true
+
+[tool.uv.sources]
+torch = { index = "pytorch-cu126" }
 
 [build-system]
 requires = ["hatchling"]

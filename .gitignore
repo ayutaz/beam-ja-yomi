@@ -7,3 +7,5 @@ cache/
 space/.beam_cache/
 space/yomibench/
 space/results/
+models/
+.superpowers/

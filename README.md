@@ -12,6 +12,8 @@ nouns. This repository measures how well [Beam-1.0-501B-A23B](https://huggingfac
 
 ## Results
 
+![Exact match by category: OpenJTalk and Beam's correction](hf/figures/results.png)
+
 Exact match over 300 sentences (runs on 2026-10-22 and 2026-10-23). Fixed / broken compare each `beam_fix` run with
 `ojt`, which gets 76 sentences wrong and 224 right.
 
@@ -56,6 +58,28 @@ What stands out:
 
 The full report is `results/report.md`, and every per-sentence output is in `results/`.
 
+### Using Beam with a check
+
+Ask Beam twice, once to read the sentence on its own (`beam_direct`) and once to correct OpenJTalk (`beam_fix`), and
+take the reading only when the two answers agree; otherwise send the sentence to a person. On the 300 sentences
+(`low`, run 0) the answers agree on 229 (76%), and 222 of those (96.9%) are exactly right, against 74.7% for
+OpenJTalk alone and 86.0% for `beam_fix` alone. The other 71 go to a person. **This rule was found after looking at
+the results, not planned in advance**, so these numbers are optimistic; the dataset card has the details.
+
+## Part 2: Yomi-Distill
+
+Can a small model, trained on Beam's corrections, fix OpenJTalk without calling Beam? Beam read 7,551 Japanese
+Wikipedia sentences twice; the 5,515 where its two answers agreed trained `llm-jp/llm-jp-3-1.8b` (LoRA). The
+candidates, the selection on a dev set and the bar to pass were pre-registered, and the frozen model was scored once.
+
+**It did not beat OpenJTalk**: 74.7% on the 300 sentences, the same as OpenJTalk (Beam correcting OpenJTalk: 86.0%).
+It mostly copies OpenJTalk's reading; its only gain is reading 町 in place names as チョウ. On 99 new sentences, when
+Beam's two answers agreed (67), the reading was right 97.0% of the time, which supports the check above.
+
+- Model: https://huggingface.co/ayousanz/yomi-distill-ja
+- Teaching data, test sets, pre-registration and results: https://huggingface.co/datasets/ayousanz/beam-yomi-teacher
+- Demo: https://huggingface.co/spaces/ayousanz/yomi-distill (code in `space_distill/`)
+
 ## What is compared
 
 | System | What it does |
@@ -92,20 +116,36 @@ uv run scripts/summarize.py                                          # results/s
 Beam samples at temperature 0.7, so a new run gives new outputs; the published `results/` hold the outputs behind the
 numbers above. To run the demo locally: `uv sync --group space`, then `uv run --group space python space/app.py`.
 
+Part 2 (Yomi-Distill) needs a CUDA GPU and the `train` group (PyTorch from the CUDA 12.6 index):
+
+```bash
+uv sync --group train --group dev --group space
+uv run scripts/build_corpus.py --n 30000                    # Wikipedia sentences, minus those near the 300
+uv run scripts/make_fresh_set.py                            # draw the 200 dev/test sentences, exclude them from the pool
+uv run scripts/run_teacher.py --limit 12000 --budget-usd 18 # Beam's two readings per sentence (HF_TOKEN in .env)
+uv run scripts/sweep_dev.py --freeze                        # train the candidates, choose on dev, freeze
+uv run scripts/predict_student.py --model models/<chosen> --items data/yomi.jsonl --out results/distill/eval300/student.jsonl
+```
+
+The checked `dev` and `test` readings are in the Hugging Face dataset (`data/fresh_dev.jsonl`,
+`data/fresh_test.jsonl`); put them at `data/fresh/dev.jsonl` and `data/fresh/test.jsonl`.
+
 ## Layout
 
 | Path | Contents |
 |---|---|
 | `data/yomi.jsonl` | the dataset (same as on Hugging Face) |
-| `yomibench/` | normalization, metrics, systems, evaluation, summary, demo helpers |
+| `yomibench/` | normalization, metrics, systems, evaluation, summary, demo helpers; Part 2's pool, teacher, student and gate |
 | `scripts/` | command-line entry points (sampling place names, review sheet, evaluation, summary, publishing) |
-| `space/` | the Gradio demo |
+| `space/` | the Gradio demo of Part 1 |
+| `space_distill/` | the Gradio demo of Part 2 (the student on ZeroGPU) |
 | `tests/` | tests |
 | `results/` | per-sentence outputs, `summary.json`, `report.md` |
 
 ## License and credits
 
-- Code: MIT. Dataset: CC BY 4.0.
+- Code: MIT. Dataset: CC BY 4.0. Part 2's teaching data and test sets: from Japanese Wikipedia, CC BY-SA 3.0
+  (on Hugging Face).
 - Place names: Japan Post postal code data (no copyright claimed by Japan Post).
 - Reading converter: [pyopenjtalk-plus](https://github.com/tsukumijima/pyopenjtalk-plus).
 - Speech in the demo: piper-plus with the Tsukuyomi-chan voice. Its terms forbid redistributing the synthesized speech

@@ -15,7 +15,7 @@ def _touch(root: Path, *paths: str):
 
 @pytest.fixture
 def repo(tmp_path):
-    _touch(tmp_path, "hf/dataset_card.md", "data/yomi.jsonl", "data/draft/number.jsonl",
+    _touch(tmp_path, "hf/dataset_card.md", "hf/figures/results.png", "data/yomi.jsonl", "data/draft/number.jsonl",
            "results/ojt.jsonl", "results/beam_fix-low-en-r0.jsonl", "results/summary.json", "results/report.md",
            "results/ojt.partial.jsonl", "space/app.py", "space/README.md", "space/requirements.txt",
            "space/.beam_cache/a.json", "space/results/old.jsonl", "space/yomibench/old.py", "space/x.wav",
@@ -26,7 +26,8 @@ def repo(tmp_path):
 
 def test_dataset_files(repo):
     got = dict((dst, src.relative_to(repo).as_posix()) for src, dst in files_for("dataset", repo))
-    assert got == {"README.md": "hf/dataset_card.md", "data/yomi.jsonl": "data/yomi.jsonl",
+    assert got == {"README.md": "hf/dataset_card.md", "figures/results.png": "hf/figures/results.png",
+                   "data/yomi.jsonl": "data/yomi.jsonl",
                    "results/ojt.jsonl": "results/ojt.jsonl",
                    "results/beam_fix-low-en-r0.jsonl": "results/beam_fix-low-en-r0.jsonl",
                    "results/summary.json": "results/summary.json", "results/report.md": "results/report.md"}
@@ -34,7 +35,7 @@ def test_dataset_files(repo):
 
 def test_space_files_exclude_secrets_cache_audio_and_stale_copies(repo):
     dsts = sorted(dst for _, dst in files_for("space", repo))
-    assert dsts == ["README.md", "app.py", "requirements.txt",
+    assert dsts == ["README.md", "app.py", "figures/results.png", "requirements.txt",
                     "results/beam_fix-low-en-r0.jsonl", "results/ojt.jsonl", "results/report.md",
                     "results/summary.json", "yomibench/__init__.py", "yomibench/systems/beam.py"]
 

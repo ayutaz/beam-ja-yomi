@@ -20,3 +20,12 @@ def test_synthesize_returns_int16_audio():
 def test_speak_rejects_empty_and_too_long():
     assert speech.speak("") is None
     assert speech.speak("ア" * (speech.MAX_CHARS + 1)) is None
+
+
+def test_credit_names_the_app_in_both_places():
+    from yomibench.speech import CREDIT, credit
+
+    assert CREDIT == credit("Beam Japanese Reading Fixer")
+    text = credit("Yomi-Distill")
+    assert "■Yomi-Distill 本体の利用規約" in text and "■Yomi-Distill:つくよみちゃん" in text
+    assert "Beam Japanese Reading Fixer" not in text

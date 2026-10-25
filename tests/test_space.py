@@ -93,3 +93,39 @@ def test_space_keeps_no_visitor_text_or_audio_on_disk(monkeypatch, tmp_path, res
 def test_try_it_starts_with_a_sentence_beam_fixed_in_every_run(results_dir):
     from space.app import TRY_IT_EXAMPLE
     assert TRY_IT_EXAMPLE == "このカレーは辛い"
+
+
+def test_try_it_says_when_the_daily_allowance_is_spent(fake_openai_daily_limit, tmp_path):
+    html, msg = try_it("放出", BeamClient(client=fake_openai_daily_limit, cache_dir=tmp_path))
+    assert "OpenJTalk" in html and "tomorrow" in msg
+
+
+def test_try_it_says_beam_is_busy_on_a_plain_rate_limit(tmp_path):
+    from tests.conftest import FakeOpenAI
+
+    busy = FakeOpenAI(limit_after=0, error_body={"error": {"code": "rate_limit_exceeded"}})
+    html, msg = try_it("放出", BeamClient(client=busy, cache_dir=tmp_path))
+    assert "OpenJTalk" in html and "busy" in msg and "minute" in msg
+
+
+def test_try_it_says_beam_was_too_slow_on_a_timeout(tmp_path):
+    import httpx
+    import openai
+
+    class Slow:
+        def __init__(self):
+            self.chat = self.completions = self
+
+        def create(self, **req):
+            raise openai.APITimeoutError(request=httpx.Request("POST", "https://example.invalid"))
+
+    html, msg = try_it("放出", BeamClient(client=Slow(), cache_dir=tmp_path))
+    assert "OpenJTalk" in html and "too long" in msg
+
+
+def test_results_tab_shows_the_figure_when_it_exists(results_dir):
+    from space.app import figure_path
+
+    assert figure_path() is not None  # hf/figures/results.png in the repository
+    demo = build_demo(results_dir, None)
+    assert any(isinstance(b, gr.Image) for b in demo.blocks.values())

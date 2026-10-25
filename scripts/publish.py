@@ -36,10 +36,13 @@ def files_for(target: str, root: Path = ROOT, results_dir: Path | None = None) -
     root = Path(root)
     results_dir = Path(results_dir) if results_dir else root / "results"
     if target == "dataset":
-        out = [(root / "hf" / "dataset_card.md", "README.md"), (root / "data" / "yomi.jsonl", "data/yomi.jsonl")]
+        out = [(root / "hf" / "dataset_card.md", "README.md"),
+               (root / "hf" / "figures" / "results.png", "figures/results.png"),
+               (root / "data" / "yomi.jsonl", "data/yomi.jsonl")]
         out += _results(results_dir)
     elif target == "space":
         out = [(root / "space" / name, name) for name in SPACE_FILES]
+        out += [(root / "hf" / "figures" / "results.png", "figures/results.png")]
         out += [(p, p.relative_to(root).as_posix()) for p in sorted((root / "yomibench").rglob("*.py"))]
         out += _results(results_dir)
     else:

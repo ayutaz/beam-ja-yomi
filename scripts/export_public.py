@@ -2,7 +2,8 @@
 
   uv run scripts/export_public.py OUT_DIR             # copy, then run the tests inside OUT_DIR
 
-Only an allow-list is copied: code, tests, the verified dataset, results, the English README and the license.
+Only an allow-list is copied: code, tests, the verified dataset, results, both Spaces, the English README and the
+license. Part 2's model, teaching data and results are on Hugging Face, not here.
 Working notes (docs/, CLAUDE.md, review/, probe/, drafts, cache/) never leave this repository.
 Nothing is pushed anywhere.
 """
@@ -32,7 +33,9 @@ def public_files(root: Path = ROOT) -> list[tuple[Path, str]]:
     out += [(p, f"scripts/{p.name}") for p in sorted((root / "scripts").glob("*"))
             if p.suffix in (".py", ".sh") and p.name not in PRIVATE_SCRIPTS]
     out += [(root / "space" / name, f"space/{name}") for name in SPACE_FILES]
+    out += [(root / "space_distill" / name, f"space_distill/{name}") for name in SPACE_FILES]  # Part 2
     out += [(root / "data" / "yomi.jsonl", "data/yomi.jsonl")]
+    out += [(root / "hf" / "figures" / "results.png", "hf/figures/results.png")]  # README and space/app.py use it
     out += [(p, f"results/{p.name}") for p in sorted((root / "results").glob("*")) if RESULT_FILE.match(p.name)]
     return out
 

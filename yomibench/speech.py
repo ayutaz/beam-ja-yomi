@@ -24,7 +24,7 @@ MAX_CHARS = 200
 
 # From the "credit required" template linked from https://tyc.rei-yumesaki.net/material/corpus/
 # (tsukuyomi-chan_credit_template1.html, 2026-10-22). The author confirms the wording before publishing.
-CREDIT = (
+CREDIT_TEMPLATE = (
     "**Voice.** 本ソフトウェアの音声合成には、フリー素材キャラクター「つくよみちゃん」（© Rei Yumesaki）が"
     "無料公開している音声データを使用しています。"
     "■[つくよみちゃんコーパス（CV.夢前黎）](https://tyc.rei-yumesaki.net/material/corpus/) "
@@ -33,11 +33,19 @@ CREDIT = (
     "（「批判・攻撃」の定義は、[つくよみちゃんキャラクターライセンス](https://tyc.rei-yumesaki.net/about/terms/#condition3)"
     "に準じます）■特定の政治的立場・宗教・思想への賛同または反対を呼びかけること。"
     "■刺激の強い表現をゾーニングなしで公開すること。■他者に対して二次利用（素材としての利用）を許可する形で公開すること。"
-    "■Beam Japanese Reading Fixer 本体の利用規約に違反すること。"
-    "【クレジット表記】■Beam Japanese Reading Fixer:つくよみちゃん "
+    "■{app} 本体の利用規約に違反すること。"
+    "【クレジット表記】■{app}:つくよみちゃん "
     "Voice model: [ayousanz/piper-plus-tsukuyomi-chan](https://huggingface.co/ayousanz/piper-plus-tsukuyomi-chan) "
     "with [piper-plus](https://github.com/ayutaz/piper-plus) (MIT)."
 )
+
+
+def credit(app: str) -> str:
+    """The voice credit with this app's name in the two places the template asks for it."""
+    return CREDIT_TEMPLATE.replace("{app}", app)
+
+
+CREDIT = credit("Beam Japanese Reading Fixer")
 
 
 def load_voice() -> PiperVoice:

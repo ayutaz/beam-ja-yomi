@@ -17,6 +17,7 @@ for p in (HERE, HERE.parent):  # the Space keeps yomibench/ next to app.py; the 
         sys.path.insert(0, str(p))
 
 import gradio as gr  # noqa: E402
+import openai  # noqa: E402
 
 from yomibench.display import diff_html, gold_diff_html, kana_to_romaji  # noqa: E402
 from yomibench.summary import render_markdown, summarize  # noqa: E402
@@ -70,6 +71,14 @@ def default_results_dir() -> Path:
     return HERE / "results"
 
 
+def figure_path() -> Path | None:
+    """The results figure: figures/ next to app.py on the Space, hf/figures/ in the repository."""
+    for p in (HERE / "figures" / "results.png", HERE.parent / "hf" / "figures" / "results.png"):
+        if p.exists():
+            return p
+    return None
+
+
 def default_beam() -> BeamClient | None:
     try:
         # one stuck request must not hold the single Try-it slot for long
@@ -108,6 +117,10 @@ def try_it(text: str, beam: BeamClient | None) -> tuple[str, str]:
         parsed = parse_response(beam.complete(build_messages("fix", "en", text, draft), "low", 0))
     except DailyLimitReached:
         return "".join(parts), "Beam's daily allowance for this demo is used up. Please try again tomorrow."
+    except openai.RateLimitError:
+        return "".join(parts), "Beam is busy right now. Showing OpenJTalk only; please try again in a minute."
+    except openai.APITimeoutError:
+        return "".join(parts), "Beam took too long to answer. Showing OpenJTalk only; please try again."
     except Exception as err:  # network or API error: keep the page usable
         return "".join(parts), f"Beam could not be reached ({type(err).__name__}). Showing OpenJTalk only."
     fixed = parsed["output"]
@@ -174,6 +187,8 @@ def build_demo(results_dir: Path, beam: BeamClient | None) -> gr.Blocks:
         gr.Markdown(_headline(summary))
         with gr.Tabs():
             with gr.Tab("Results"):
+                if figure_path() is not None:
+                    gr.Image(str(figure_path()), show_label=False, interactive=False, buttons=[])
                 gr.Markdown(render_markdown(summary) if summary["conditions"] else "_No results yet._")
             with gr.Tab("Examples"):
                 with gr.Row():

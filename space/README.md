@@ -27,3 +27,9 @@ the converter's reading.
 
 Live correction uses the Reflection API (secret `REFLECTION_API_KEY`). Without it, the Space shows
 OpenJTalk's reading only.
+
+**How Beam is used.** Beam gets the sentence and OpenJTalk's reading and returns the corrected
+reading (`reasoning_effort` low; the prompts are in the code repository). The draft helps for
+numbers and homographs and hurts for place names, where Beam tends to keep OpenJTalk's マチ for 町.
+On the 300 sentences, asking Beam a second time without the draft and keeping the reading only when
+both answers agree left three quarters of the sentences 97% right (a post-hoc check; see the dataset card).
